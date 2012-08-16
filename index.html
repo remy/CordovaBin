@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset=utf-8 />
-<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width;" />
+<meta name="viewport" content="user-scalable=no, width=device-width;" />
 <script src="cordova-2.0.0.js"></script>
 <title>PhoneGapBin</title>
 <style>
@@ -61,7 +61,7 @@ username.form.onsubmit = function (e) {
 
   localStorage.setItem('jsbin-username', username.value);
   
-  var scripts = ['cordova-2.0.0.js', 'spike.js'];
+  var scripts = ['spike.js'];
   scripts.forEach(function (url) {
     var script = document.createElement('script');
     script.src = url
@@ -79,7 +79,7 @@ username.form.onsubmit = function (e) {
 };
 
 document.addEventListener("deviceready", function () {
-  localStorage.setItem('jsbin-ios-root', document.location.split('/').slice(0, -1).join('/') + '/');
+  localStorage.setItem('jsbin-ios-root', document.location.toString().replace(/index.html$/, ''));
 }, false);
 </script>
 </body>

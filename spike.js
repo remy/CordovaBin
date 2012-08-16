@@ -576,7 +576,8 @@ function inject(ready) {
   var root = {
     android: 'file:///android_asset/www/',
     blackberry: 'local:///',
-    ios: localStorage.getItem('jsbin-ios-root')
+    iphone: localStorage.getItem('jsbin-ios-root'),
+    'iphone simulator': localStorage.getItem('jsbin-ios-root')
   }[device.platform.toLowerCase()] || 'file:///';
   var code = ['<head>',
               '<script src="' + root + 'cordova-2.0.0.js"></script>',
