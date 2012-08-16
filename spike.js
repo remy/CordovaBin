@@ -574,11 +574,13 @@ function fail(error) {
 function inject(ready) {
   // window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, fail);
   var root = {
-    android: 'file:///android_asset/www'
-  }[device.platform.toLowerCase()];
+    android: 'file:///android_asset/www/',
+    blackberry: 'local:///',
+    ios: localStorage.getItem('jsbin-ios-root')
+  }[device.platform.toLowerCase()] || 'file:///';
   var code = ['<head>',
-              '<script src="' + root + '/cordova-2.0.0.js"></script>',
-              '<script src="' + root + '/spike.js"></script>',
+              '<script src="' + root + 'cordova-2.0.0.js"></script>',
+              '<script src="' + root + 'spike.js"></script>',
               '<script>runSpike();</script>'].join('\n');
   htmlToSave = htmlToSave.replace(/<head>/i, code);
 }
