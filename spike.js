@@ -576,11 +576,11 @@ function inject(ready) {
   var root = {
     android: 'file:///android_asset/www'
   }[device.platform.toLowerCase()];
-  var code = ['<script src="' + root + '/cordova-2.0.0.js"></script>',
+  var code = ['<head>',
+              '<script src="' + root + '/cordova-2.0.0.js"></script>',
               '<script src="' + root + '/spike.js"></script>',
-              '<script>runSpike();</script>',
-              '</head>'].join('\n');
-  htmlToSave = htmlToSave.replace(/<\/head>/i, code);
+              '<script>runSpike();</script>'].join('\n');
+  htmlToSave = htmlToSave.replace(/<head>/i, code);
 }
 
 function renderStream() {
@@ -602,7 +602,8 @@ function renderStream() {
 }
 
 var user = localStorage.getItem('jsbin-username'),
-    id = 'http://local.rem.io/' + user + '/last/',
+    jsbinroot = 'jsbin.com',
+    id = 'http://' + jsbinroot + '/' + user + '/last/',
     queue = [],
     msgType = '',
     useSS = false,
