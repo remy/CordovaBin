@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset=utf-8 />
+  <meta name="viewport" content="width=device-width">
+<title>PhoneGapBin</title>
+<style>
+body, input { font-family: "Helvetica Neue", arial; }
+body { margin: 20px; font-size: 20px; background: white; color: #222; }
+
+h1, h2 { font-weight: 200; }
+
+code { background: #ececec; }
+
+input { 
+  font-size: 20px; 
+  padding: 5px 10px;
+  vertical-align: baseline;
+}
+
+input[type=submit] {
+  padding: 5px 10px;
+}
+
+input2[type=submit] {
+  background: #207BB0;
+  color: #fff;
+  border: 1px solid #41627C;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 16px;
+}
+
+input2[type=submit]:active {
+  border: 1px solid #000;
+}
+
+form { margin: 40px; text-align: center; margin-bottom: 80px; }
+
+small { text-align: center; color: #999; }
+</style>
+</head>
+<body>
+  <h1>PhoneGapBin</h1>
+  <h2>Where PhoneGap and JS Bin made love, and it came out okay looking.</h2>
+  <p>This tool will allow you to inject, without any build or deploy, the contents of your latest JS Bin (so the content on <code>http://jsbin.com/[you]/last/</code>.</p>
+  <p>Just enter your username below (registration on <code>jsbin.com</code> is free), and hit go, and this app will remember your user and when you hit the "Run with JS" button in JS Bin (or do <code>cmd+enter</code>)
+    
+    
+<form id="savename">
+<input id="username" placeholder="JS Bin username?">
+<input type="submit" value="Go!">
+</form>
+  
+  <p><small>Hold on to your pants! &mdash; @rem</small></p>
+<script>
+var username = document.getElementById('username');
+username.form.onsubmit = function (e) {
+  e.preventDefault();
+
+  localStorage.setItem('jsbin-username', username.value);
+  
+  var scripts = ['cordova-2.0.0.js', 'spike.js'];
+  scripts.forEach(function (url) {
+    var script = document.createElement('script');
+    script.src = url
+    document.body.appendChild(script);
+  });
+
+  var retry = setInterval(function () {
+    if (window['reload'] !== undefined) {
+      clearInterval(retry);
+      reload();
+    }
+  }, 1000);
+
+  return false; // just in case
+};
+</script>
+</body>
+</html>
