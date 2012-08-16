@@ -2,8 +2,8 @@
 <html>
 <head>
 <meta charset=utf-8 />
-  <meta name="viewport" content="width=device-width">
-  <script src="cordova-2.0.0.js"></script>
+<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width;" />
+<script src="cordova-2.0.0.js"></script>
 <title>PhoneGapBin</title>
 <style>
 body, input { font-family: "Helvetica Neue", arial; }
@@ -53,7 +53,7 @@ small { text-align: center; color: #999; }
 <input type="submit" value="Go!">
 </form>
   
-  <p><small>Hold on to your pants! &mdash; <a href="rem.html">@rem</a></small></p>
+  <p><small>Hold on to your pants! &mdash; <a href="http://twitter.com/rem">@rem</a></small></p>
 <script>
 var username = document.getElementById('username');
 username.form.onsubmit = function (e) {
@@ -79,7 +79,7 @@ username.form.onsubmit = function (e) {
 };
 
 document.addEventListener("deviceready", function () {
-  console.log('device ready!!!')
+  localStorage.setItem('jsbin-ios-root', document.location.split('/').slice(0, -1).join('/') + '/');
 }, false);
 </script>
 </body>
