@@ -24,7 +24,7 @@
     
     <icon src="icon.png" />
     
-    <access origin="http://local.rem.io*" /> <!-- for testing -->
+    <access origin="http://jsbin.com*" /> <!-- for testing -->
     
     <feature name="http://api.phonegap.com/1.0/battery"/>
     <feature name="http://api.phonegap.com/1.0/camera"/>
