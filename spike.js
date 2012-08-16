@@ -537,7 +537,7 @@ function restore() {
 var htmlToSave = '', file = null;
 
 window.reload = function() {
-  console.log('got a reload');
+  console.log('getting new page: ' + id);
 
   var xhr = new XMLHttpRequest(); 
   xhr.open('GET', id + 'quiet', true); 
@@ -560,20 +560,25 @@ function gotFileEntry(fileEntry) {
 
 function gotFileWriter(writer) {
   writer.onwriteend = function(evt) {
+    console.log('Write complete - reloading');
     window.location = file.toURL();
   };
   inject();
-  alert(htmlToSave);
   writer.write(htmlToSave);
 }
 
 function fail(error) {
-  console.log(error.code);
+  console.log('Fail: ' + error.code);
 }
 
-function inject() {
-  var code = ['<script src="cordova-2.0.0.js"></script>',
-              '<script src="spike.js"></script>',
+function inject(ready) {
+  // window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, fail);
+  var root = {
+    android: 'file:///android_asset/www'
+  }[device.platform.toLowerCase()];
+  var code = ['<script src="' + root + '/cordova-2.0.0.js"></script>',
+              '<script src="' + root + '/spike.js"></script>',
+              '<script>runSpike();</script>',
               '</head>'].join('\n');
   htmlToSave = htmlToSave.replace(/<\/head>/i, code);
 }
@@ -589,6 +594,10 @@ function renderStream() {
     }
   });
 
+  es.addEventListener('error', function () {
+    console.log('Error on stream');
+  });
+
   es.addEventListener('reload', reload);
 }
 
@@ -600,19 +609,25 @@ var user = localStorage.getItem('jsbin-username'),
     es = null,
     hasRun = false;
 
-function run() {
+window.runSpike = function(e) {
+  console.log('run()')
   if (hasRun) return;
   hasRun = true;
   setTimeout(function () {
+    console.log('connecting to EventSource ' + id);
     es = new EventSource2(id + '?' + Math.random());
     renderStream();
   }, 500);
 
   addEvent('error', function (event) {
+    console.log('ERROR: ' + event.message);
     error({ message: event.message }, event.filename + ':' + event.lineno);
   });
 }
 
-document.addEventListener("deviceready", run, false);
+// document.addEventListener("deviceready", run, false);
 
 }());
+
+console.log('Loaded spike.js')
+

@@ -3,6 +3,7 @@
 <head>
 <meta charset=utf-8 />
   <meta name="viewport" content="width=device-width">
+  <script src="cordova-2.0.0.js"></script>
 <title>PhoneGapBin</title>
 <style>
 body, input { font-family: "Helvetica Neue", arial; }
@@ -52,7 +53,7 @@ small { text-align: center; color: #999; }
 <input type="submit" value="Go!">
 </form>
   
-  <p><small>Hold on to your pants! &mdash; @rem</small></p>
+  <p><small>Hold on to your pants! &mdash; <a href="rem.html">@rem</a></small></p>
 <script>
 var username = document.getElementById('username');
 username.form.onsubmit = function (e) {
@@ -76,6 +77,10 @@ username.form.onsubmit = function (e) {
 
   return false; // just in case
 };
+
+document.addEventListener("deviceready", function () {
+  console.log('device ready!!!')
+}, false);
 </script>
 </body>
 </html>
