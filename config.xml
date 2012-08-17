@@ -30,7 +30,7 @@
     
     <icon src="icon.png" />
     
-    <access origin="http://jsbin.com*" /> <!-- for testing -->
+    <access origin="*" /> <!-- for testing -->
     
     <gap:splash src="res/screen/android_hdpi_landscape.png"      width="800"  height="480"  gap:platform="android" />
     <gap:splash src="res/screen/android_hdpi_portrait.png"       width="480"  height="800"  gap:platform="android" />
@@ -53,8 +53,6 @@
     <gap:splash src="res/screen/windows_phone_portrait.jpg"      width="480"  height="800"  gap:platform="winphone" />
 
     <feature name="http://api.phonegap.com/1.0/device" />
-
-    
     <feature name="http://api.phonegap.com/1.0/battery"/>
     <feature name="http://api.phonegap.com/1.0/camera"/>
     <feature name="http://api.phonegap.com/1.0/contacts"/>
