@@ -561,7 +561,7 @@ function gotFileEntry(fileEntry) {
 function gotFileWriter(writer) {
   writer.onwriteend = function(evt) {
     console.log('Write complete - reloading');
-    window.location = file.toURL();
+    window.location = file.toURL() + '?' + Math.random(); // bust that bad boy
   };
   inject();
   writer.write(htmlToSave);
