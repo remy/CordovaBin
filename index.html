@@ -55,25 +55,45 @@ footer a { color: #fff; }
 
 body div { padding-top: 0; padding-bottom: 10px; }
 header { background-position: -15px; }
+#info:before {
+ content: 'none';
+ position: fixed;
+}
 
 @media (min-width:320px) {
+  #info:before {
+   content: '320px';
+   position: fixed;
+  }
   body div { padding-top: 10px; padding-bottom: 10px; }
   header { background-position: -15px; }
 }
 
-@media (orientation: portrait) AND (min-width:768px) {
+@media (orientation: portrait) AND (min-width:600px) {
+  #info:before {
+   content: '768px';
+   position: fixed;
+  }
+
   body div { padding-top: 100px; padding-bottom: 100px; }
   header { background-position: 0; }
 }
 
-@media (orientation: landscape) AND (min-width:768px) {
+@media (orientation: landscape) AND (min-width:600px) {
+  #info:before {
+   content: '768px landscape';
+   position: fixed;
+  }
+
   body div { padding-top: 100px; padding-bottom: 100px; }
   header { background-position: 0; }
 }
+
 
 </style>
 </head>
 <body>
+<!-- <span id="info"></span> -->
 <div>
   <header>
     <h1>PhoneGapBin</h1>
@@ -83,9 +103,8 @@ header { background-position: -15px; }
   <p>Just enter your username below (registration on <code>jsbin.com</code> is free), and hit go, and this app will remember your user and when you hit the "Run with JS" button in JS Bin (or <code>cmd+enter</code>).</p>
   </div>
     
-    
 <form id="savename">
-<input id="username" spellcheck="false" autocapitalize="off" autocorrect="off" type="text" placeholder="JS Bin username?">
+<input id="username" type="text" placeholder="JS Bin username?">
 <input type="submit" value="Go!">
 </form>
   <footer><small>Hold on to your pants! &mdash; <a href="http://twitter.com/rem">@rem</a></small></footer>
