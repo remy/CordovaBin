@@ -1,3 +1,11 @@
+try {
+  console.log('init');
+} catch (e) {
+  var console = {
+    log: function () {};
+  };
+}
+
 // This simple script allows the client to take control of the device
 // and send a spike to reload the browser.
 // http://www.youtube.com/watch?v=mIq9jFdEfZo#t=2m03 "Spike"
