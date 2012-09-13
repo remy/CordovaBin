@@ -1,8 +1,35 @@
+// backup helpers
+window.alert = window.alert || navigator.notification.alert;
+
+if (!window.logCounter) {
+  // we re-set this lot up because originally index.html does the work
+  window.logCounter = function () {
+    return ++logCounter.id + '. ';
+  };
+
+  window.logCounter.id = 0;
+
+  // output any errors to console log - then throw
+  window.oldOnError = window.onerror;
+  // Override previous handler.
+  window.onerror = function customErrorHandler(msg, url, linenumber) {    
+    console.log(logCounter() + 'Error: ' + msg + ' in ' + url + '@' + linenumber);
+
+    if (window.oldOnError) {
+      // Call previous handler.
+      return window.oldOnError(msg, url, linenumber);
+    }
+
+    // Just let default handler run.
+    return false;
+  };
+}
+
 try {
-  console.log('init');
+  console.log(logCounter() + 'spike loaded');
 } catch (e) {
   var console = {
-    log: function () {};
+    log: function (str) { alert(str, function () {}, 'console', 'Ok'); }
   };
 }
 
@@ -24,7 +51,7 @@ try {
 
 */
 
-// Found @yaffle's EventSource polyfill to be superb (over my own)
+// Found @yaffle's EventSource polyfill to be superb (over my own EventSource polyfill)
 /*jslint indent: 2, vars: true */
 /*global setTimeout, clearTimeout */
 
@@ -301,7 +328,7 @@ try {
         if (part.length > 0) {
           wasActivity = true;
         }
-        console.log('responseText: ' + responseText)
+        console.log(logCounter() + 'responseText: ' + responseText)
         while ((i = part.search(endOfLine)) !== -1) {
           field = responseText.slice(offset, charOffset + i);
           i += part.slice(i, i + 2) === '\r\n' ? 2 : 1;
@@ -521,7 +548,7 @@ function error(error, cmd) {
   // } else {
   //   queue.push(msg);
   // }
-  console.log(JSON.stringify(error));
+  console.log(logCounter() + JSON.stringify(error));
 }
 
 function restore() {
@@ -545,16 +572,22 @@ function restore() {
 var htmlToSave = '', file = null;
 
 window.reload = function() {
-  console.log('getting new page: ' + id);
-
   var xhr = new XMLHttpRequest(); 
-  xhr.open('GET', id + 'quiet', true); 
+  xhr.open('GET', url, true);
+  console.log(logCounter() + 'XHR get: ' + url); 
   xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); 
-  xhr.onload = function () {
+  /*xhr.onload = function () {
     htmlToSave = xhr.responseText;
     window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);
+  };*/
+  xhr.onreadystatechange = function () {
+    if ((this.status === 200) && (this.readyState === 0 || this.readyState === 4)) {
+	  	console.log(logCounter() + 'reading response');
+		  htmlToSave = xhr.responseText;
+		  window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);	  
+	  }
   };
-  xhr.send();
+  xhr.send(null);
 }
 
 function gotFS(fileSystem) {
@@ -568,35 +601,53 @@ function gotFileEntry(fileEntry) {
 
 function gotFileWriter(writer) {
   writer.onwriteend = function(evt) {
-    console.log('Write complete - reloading');
-    window.location = file.toURL() + '?' + Math.random(); // bust that bad boy
+    window.location.replace(file.toURL() + '?' + Math.random()); // bust that bad boy
   };
   inject();
   writer.write(htmlToSave);
 }
 
 function fail(error) {
-  console.log('Fail: ' + error.code);
+  alert('Fail to get url: ' + error.code);
 }
 
-function inject(ready) {
-  // window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, fail);
-  var root = {
-    android: 'file:///android_asset/www/',
-    blackberry: 'local:///',
-    iphone: localStorage.getItem('jsbin-ios-root'),
-    'iphone simulator': localStorage.getItem('jsbin-ios-root')
-  }[device.platform.toLowerCase()] || 'file:///';
+function inject(ready) {  
   var code = ['<head>',
               '<script src="' + root + 'cordova-2.0.0.js"></script>',
               '<script src="' + root + 'spike.js"></script>',
-              '<script>runSpike();</script>'].join('\n');
-  htmlToSave = htmlToSave.replace(/<head>/i, code);
+              '<script>runSpike();</script>'
+			  ];
+
+  if (htmlToSave.indexOf('cordova-')) { // TODO make this match better!
+    // remove cordova if it's found
+    code.splice(1, 1);
+  }
+
+  if (!usingjsbin) {
+    code.push('<script src="' + root + 'live.js"></script>');
+  }
+
+  htmlToSave = htmlToSave.replace(/<head>/i, code.join('\n'));
+
+  // means we loaded from index.html - so the user selected this particular url
+  if (window.dateUtil) {
+    // if this came from jsbin, then try to grab the actual url
+    htmlToSave.replace(/Source can be edited via (.*?)edit/i, function (all, match) {
+      var history = localStorage.getItem('phonegapbin.history'),
+          str = '';
+      if (history) {
+        str = '\n';
+      }
+      str += ((new Date()).getTime() + '|' + match);
+      localStorage.setItem('phonegapbin.history', history + str);
+    });
+
+  }
 }
 
 function renderStream() {
   es.addEventListener('css', function (event) {
-    var style = document.getElementById('jsbin-css');
+    var style = document.getElementById('phonegapbin.css');
 
     if (style.styleSheet) {
       style.styleSheet.cssText = event.data;
@@ -606,15 +657,14 @@ function renderStream() {
   });
 
   es.addEventListener('error', function () {
-    console.log('Error on stream');
+    // alert('Error on stream');
   });
 
   es.addEventListener('reload', reload);
 }
 
-var user = localStorage.getItem('jsbin-username'),
-    jsbinroot = 'jsbin.com',
-    id = 'http://' + jsbinroot + '/' + user + '/last/',
+var url = localStorage.getItem('phonegapbin.url'),
+    usingjsbin = url.indexOf('jsbin') !== -1,
     queue = [],
     msgType = '',
     useSS = false,
@@ -622,24 +672,27 @@ var user = localStorage.getItem('jsbin-username'),
     hasRun = false;
 
 window.runSpike = function(e) {
-  console.log('run()')
   if (hasRun) return;
   hasRun = true;
   setTimeout(function () {
-    console.log('connecting to EventSource ' + id);
-    es = new EventSource2(id + '?' + Math.random());
-    renderStream();
+    console.log(logCounter() + 'connecting to EventSource ' + url);
+    es = new EventSource2(url + '?' + Math.random());
+    if (usingjsbin) renderStream();
+    // else, we're using live.js to detect refreshes.
   }, 500);
+};
 
-  addEvent('error', function (event) {
-    console.log('ERROR: ' + event.message);
-    error({ message: event.message }, event.filename + ':' + event.lineno);
-  });
-}
+var root = {
+    android: 'file:///android_asset/www/',
+    blackberry: 'local:///',
+  	wince: localStorage.getItem('phonegapbin.detect-root') + '../'
+  }[device.platform.toLowerCase()] || localStorage.getItem('phonegapbin.detect-root');
 
-// document.addEventListener("deviceready", run, false);
+console.log(logCounter() + 'root: ' + root);
+
+document.addEventListener('deviceready', runSpike, false);
 
 }());
 
-console.log('Loaded spike.js')
+console.log(logCounter() + 'spike.js loaded');
 
