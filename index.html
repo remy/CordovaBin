@@ -4,7 +4,6 @@
 <meta charset=utf-8 />
 <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale: 1.0" />
 <script src="cordova-2.0.0.js"></script>
-<script src="dateutil.js"></script>
 <title>PhoneGapBin</title>
 <style>
 body, input { font-family: "Helvetica Neue", arial; }
@@ -26,37 +25,11 @@ input[type=submit] {
 /*   font-size: 15px; */
 }
 
-input[type=text], select, option {
+input[type=text] {
   font-size: 16px; 
   vertical-align: baseline;
   padding: 5px 10px;
   border: 2px solid #47A9FF;
-  width: 70%;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-label { 
-  box-sizing: border-box;
-  color: #125379; 
-  float: left; 
-  display: block; 
-  text-align: right; 
-  width: 30%;
-  line-height: 2em;
-  padding-right: 10px;
-}
-
-form fieldset div { 
-  float: right; 
-  width: 70%; 
-  padding: 0; 
-}
-
-form small { line-height: 1em; width: 70%; display: inline-block; opacity: 0.8; }
-
-form fieldset { 
- border: 0;
 }
 
 input[type=submit] {
@@ -74,14 +47,13 @@ input[type=submit]:active {
   background: #4697C7;
 }
 
-form { margin: 0 !important; padding: 20px 20px 0 20px; background: #A3D4FF; }
+form { text-align: center; margin: 0 !important; padding: 20px; background: #A3D4FF; }
 header { background: url(icon.png) no-repeat; background-size: contain; background-position-x: -15px; }
 header > * { margin-left: 70px; }
 footer { background: #a3d4ff; display: block; padding: 20px; padding-top: 120px; margin: 0; color: #fff; text-align: center; }
 footer a { color: #fff; }
 
 body div { padding-top: 0; padding-bottom: 10px; }
-
 header { background-position: -15px; }
 #info:before {
  content: 'none';
@@ -132,146 +104,34 @@ header { background-position: -15px; }
   </div>
     
 <form id="savename">
-<fieldset>
-<label for="username">JS Bin username</label>
-<div>
-<input id="username" type="text" placeholder="">
-<input type="submit" id="byuser" value="Load">
-</div>
-</fieldset>
-</form>
-<form>
-<fieldset>
-<label for="url">Custom URL<br><small>Note: auto-reloading is not supported for non-JS Bin urls.</small></label>
-<div>
-<input id="url" type="text" placeholder="http://">
-<input type="submit" id="byurl" value="Load">
-</div>
-</fieldset>
-</form>
-<form>
-<fieldset>
-<label for="history">Previous URL</label>
-<div>
-<select id="history"><option>No history yet</option></select>
-<input type="submit" id="byhistory" value="Load">
-</div>
-</fieldset>
+<input id="username" type="text" placeholder="JS Bin username?">
+<input type="submit" value="Go!">
 </form>
   <footer><small>Hold on to your pants! &mdash; <a href="http://twitter.com/rem">@rem</a></small></footer>
 <script>
-var form = document.getElementsByTagName('form')[0],
-    username = document.getElementById('username'),
-    urlEl = document.getElementById('url'),
-    historyEl = document.getElementById('history'),
-    defaultHistory = 'No history yet',
-    urlHistory = localStorage.getItem('phonegapbin.history'),
-    jsbinroot = 'jsbin.com';
- 
-if (urlHistory) {
-  urlHistory = urlHistory.split('\n');
-} else {
-  urlHistory = [];
-}
+var username = document.getElementById('username');
+username.form.onsubmit = function (e) {
+  if (e.preventDefault) e.preventDefault();
 
-// this is used to help us understand the order in which the errors
-// fired, as in some cases, the console.log in PhoneGap is async
-function logCounter() {
-  return ++logCounter.id + '. ';
-}
-
-logCounter.id = 0;
-
-// output any errors to console log - then throw
-var oldOnError = window.onerror;
-// Override previous handler.
-window.onerror = function customErrorHandler(msg, url, linenumber) {
-  console.log(logCounter() + 'Error: ' + msg + ' in ' + url + '@' + linenumber);
-
-  if (oldOnError) {
-    // Call previous handler.
-    return oldOnError(msg, url, linenumber);
-  }
-
-  // Just let default handler run.
-  return false;
-};
-
-function loadSpike() {
+  localStorage.setItem('jsbin-username', username.value);
+  
   var script = document.createElement('script');
   script.src = 'spike.js';
   document.body.appendChild(script);
 
   var retry = setInterval(function () {
-    if (window.reload !== undefined) {
+    if (window['reload'] !== undefined) {
       clearInterval(retry);
       reload();
     }
-  }, 250);
-}
+  }, 1000);
 
-document.body.onclick = function (e) {
-  e.preventDefault();
-  var prev = e.target.previousElementSibling;
-  if (e.target.type === 'submit') {
-    console.log(e.target, prev);
-    if (prev === username) {
-      usernameSubmit();
-    } else if (prev === urlEl) {
-      urlSubmit();
-    } else if (prev === historyEl) {
-      historySubmit();
-    }
-  }
+  return false; // just in case
 };
 
-function usernameSubmit() {
-
-  localStorage.setItem('phonegapbin.username', username.value);
-  localStorage.setItem('phonegapbin.url', 'http://' + jsbinroot + '/' + username.value + '/last/quiet');
- 
-  loadSpike();
-};
-  
-function urlSubmit() {
-  var url = urlEl.value;
-  if (url.indexOf('://') === -1) {
-    url = 'http://' + url;
-  }
-  urlHistory.unshift((new Date()).getTime() + '|' + url);
-  localStorage.setItem('phonegapbin.history', urlHistory.join('\n'));
-
-  localStorage.setItem('phonegapbin.url', url);
-  loadSpike();
-};
-
-function historySubmit() {
-  e.preventDefault();
-  localStorage.setItem('phonegapbin.url', historyEl.value);
-  loadSpike(); 
-};
-
-document.addEventListener('deviceready', deviceready = function () {
-  window.alert = window.alert || navigator.notification.alert;
-  localStorage.setItem('phonegapbin.ios-root', document.location.toString().replace(/index.html$/, ''));
-
-  var jsbinuser = localStorage.getItem('phonegapbin.username');
-  if (jsbinuser) {
-    username.value = jsbinuser;
-  }
-
-  var html = '';
-
-  if (urlHistory.length) {
-    for (var i = 0; i < urlHistory.length; i++) {
-      var parts = urlHistory[i].split('|', 2),
-          date = new Date(parts[0]*1);
-      html += '<option value="' + parts[1] + '">' + parts[1] + ' @ ' + dateUtil.time(date) + ' ' + dateUtil.shortdate(date) + '</option>';
-    }
-    historyEl.innerHTML = html;
-  }
+document.addEventListener("deviceready", function () {
+  localStorage.setItem('jsbin-detect-root', document.location.toString().replace(/index.html$/, ''));
 }, false);
-deviceready();
 </script>
 </body>
 </html>
