@@ -1,4 +1,4 @@
-PhoneGapBin
+CordovaBin
 ===========
 
-Where PhoneGap and JS Bin made love, and it came out okay looking.
+Where PhoneGap/Cordova and JS Bin made love, and it came out okay looking.

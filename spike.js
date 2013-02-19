@@ -595,7 +595,12 @@ function inject(ready) {
               '<script src="' + root + 'cordova-2.0.0.js"></script>',
               '<script src="' + root + 'spike.js"></script>',
               '<script>runSpike();</script>'].join('\n');
-  htmlToSave = htmlToSave.replace(/<head>/i, code);
+  if (htmlToSave.indexOf('<head') !== -1) {
+    htmlToSave = htmlToSave.replace(/<head>/i, code);
+  } else {
+    // slap it in at the top
+    htmlToSave = code + htmlToSave;
+  }
 }
 
 function renderStream() {
@@ -640,6 +645,21 @@ window.runSpike = function(e) {
     error({ message: event.message }, event.filename + ':' + event.lineno);
   });
 }
+
+document.addEventListener('pause', function () {
+  // kill stream
+  if (es) {
+    es.close();
+  }
+}, false);
+
+document.addEventListener('resume', function () {
+  setTimeout(function () {
+    es = new EventSource2(id + '?' + Math.random());
+    renderStream();
+  }, 0);
+}, false);
+
 
 // document.addEventListener("deviceready", run, false);
 
