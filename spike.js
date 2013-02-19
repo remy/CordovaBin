@@ -592,7 +592,7 @@ function inject(ready) {
     'iphone simulator': localStorage.getItem('jsbin-detect-root')
   }[device.platform.toLowerCase()] || localStorage.getItem('jsbin-detect-root') || 'file:///';*/
   var code = ['<head>',
-              '<script src="' + root + 'cordova-2.0.0.js"></script>',
+              '<script src="' + root + 'phonegap.js"></script>',
               '<script src="' + root + 'spike.js"></script>',
               '<script>runSpike();</script>'].join('\n');
   if (htmlToSave.indexOf('<head') !== -1) {
